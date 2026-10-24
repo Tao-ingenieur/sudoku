@@ -39,7 +39,7 @@ const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || [
   await page.setRequestInterception(true);
   page.on('request', request => /^https?:/.test(request.url()) ? request.abort() : request.continue());
 
-  await page.goto(pathToFileURL(path.join(ROOT, '.build/web/index.html')).href, { waitUntil: 'load' });
+  await page.goto(pathToFileURL(path.resolve(ROOT, process.env.SUDOKU_WEB_ENTRY || '.build/web/index.html')).href, { waitUntil: 'load' });
   await page.waitForFunction(() => document.querySelectorAll('#playBoard .cell').length === 81, { timeout: 30000 });
 
   // Language switching must reach the OCR dialog without a reload.

@@ -30,7 +30,7 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Electron 主进程 `desktop/main.js` 只创建窗口并加载根目录 `index.html`，不包含任何业务逻辑。
+Electron 主进程 `platforms/desktop/main.js` 创建窗口并加载 `.build/web/index.html`，不包含业务逻辑。
 
 ## 3. 为什么使用 UMD 经典脚本
 
@@ -39,7 +39,7 @@ Electron 主进程 `desktop/main.js` 只创建窗口并加载根目录 `index.ht
 - 每个模块使用 UMD 头：Node 下 `module.exports`，浏览器下挂到 `window.Sudoku`；
 - `index.html` 按依赖顺序加载脚本；
 - 同一个文件既可 `require()` 测试，也可被 Electron/网页直接使用；
-- 不需要构建步骤，也不牺牲模块化文件结构。
+- 不依赖模块打包器；同步脚本生成语言包、离线 Worker 和各平台共享资源。
 
 对应测试 `test/i18n.test.js` 会检查脚本顺序、路径存在性与无外部 URL。
 
@@ -222,9 +222,9 @@ nakedSingle → hiddenSingle
 
 ## 11. 桌面端
 
-- `desktop/main.js`：`BrowserWindow` + `loadFile(index.html)`。
+- `platforms/desktop/main.js`：`BrowserWindow` + `loadFile(.build/web/index.html)`。
 - 安全：`contextIsolation`、`sandbox`、`nodeIntegration:false`，禁止导航/弹窗。
-- electron-builder 将 `index.html / styles.css / src / desktop/main.js` 打包进 `app.asar`；核心代码只有一份。
+- electron-builder 将 `.build/web/` 和 `platforms/desktop/main.js` 打包进 `app.asar`；核心代码只有一份。
 - Windows 目标：`nsis`（安装版）与 `portable`（便携版），x64。
 
 ## 12. 性能
@@ -264,14 +264,14 @@ Web  Electron  Android   (小程序页面)         Capacitor   Android   Electro
 ### Android 壳
 
 - `MainActivity`：WebView、JS、DOM Storage、本地文件、系统栏 insets、返回键与生命周期。
-- `syncWebAssets` Gradle 任务每次构建把根目录 Web 应用复制到 `assets/www`。
+- `syncWebAssets` Gradle 任务每次构建把 `.build/web/` 复制到 `assets/www`。
 - 无 INTERNET 权限；不加载网络 URL。
 
 ### iOS 壳
 
 - Capacitor 8.5.3 + Swift Package Manager。
 - Xcode target `App`，共享 Scheme `App`，iOS 15+。
-- Web 资源位于 `ios/App/App/public/`，由同一同步脚本生成。
+- Web 资源位于 `platforms/ios/App/App/public/`，由同一同步脚本生成。
 - 仅要求模拟器，不需要代码签名证书或 ipa。
 
 ## 14. 回放、统计与主题（V10）

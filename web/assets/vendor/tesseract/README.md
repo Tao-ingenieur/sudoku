@@ -46,3 +46,8 @@ After upgrading Tesseract.js, re-copy `tesseract.min.js` / `worker.min.js`, re-a
 
 License texts and bundled dependency notices are in `licenses/`.
 Run `npm run sync:platforms` to regenerate the embedded English data.
+
+`worker-bundle.js` is generated from the patched worker and the WASM bootstrap.
+The UI creates a Blob Worker from this bundle, avoiding blocked file:// imports.
+Original worker/core files remain build inputs; distribution bundles include only
+the generated worker bundle. Regenerate it with `npm run sync:platforms`.

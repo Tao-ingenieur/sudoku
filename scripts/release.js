@@ -44,13 +44,15 @@ function metadata(rebuilt=[]) {
   info.source='repo/';
   info.node=process.version;
   info.lockfileSha256=hash(path.join(ROOT,'package-lock.json'));
+  const revision=fs.existsSync(path.join(ROOT,'.git'))?spawnSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}):null;
+  info.sourceCommit=revision?.status===0?revision.stdout.trim():null;
   for(const kind of ['windows','android']) {
     const dir=path.join(DIST,kind);
     if(!fs.existsSync(dir)) continue;
     for(const rel of files(dir).filter(f=>/\.(exe|apk)$/.test(f))) {
       const key=kind+'/'+rel, sha256=hash(path.join(dir,rel));
       const previous=info.artifacts[key];
-      info.artifacts[key]={sha256,provenance:rebuilt.includes(kind)?'rebuilt-from-repo':previous?.sha256===sha256?previous.provenance:'preserved-original-not-yet-rebuilt'};
+      info.artifacts[key]={sha256,provenance:rebuilt.includes(kind)?'rebuilt-from-repo':previous?.sha256===sha256?previous.provenance:'preserved-original-not-yet-rebuilt',sourceCommit:rebuilt.includes(kind)?info.sourceCommit:previous?.sha256===sha256?previous.sourceCommit??null:null};
     }
   }
   fs.writeFileSync(target,JSON.stringify(info,null,2)+'\n');

@@ -28,14 +28,15 @@ V12 新增：从图片识别 9×9 数独并直接载入棋盘，与原有 81 字
 
 - 使用 **Tesseract.js 7 + Tesseract WASM LSTM**，只识别数字（白名单 1–9）。
 - 资源全部随应用分发，位于 `web/assets/vendor/tesseract/`：
-  - `tesseract.min.js`、`worker.min.js`
-  - `tesseract-core-lstm.wasm.js`（单文件 LSTM 核心，避免多份 WASM 体积）
+  - `tesseract.min.js`
+  - `worker-bundle.js`：由保留在源码仓库中的 Worker 与单文件 WASM 核心生成
   - `eng-data.js`：`eng.traineddata.gz` 的 Base64 内嵌版本，约 1.9 MB
-- 为实现 `file://` 离线运行，做了两处适配：
+- 为实现 `file://` 离线运行，做了以下适配：
   1. 语言数据以 `{code:'eng', data: Uint8Array}` 直接交给 Worker，不发起网络请求；
   2. 仓库内 `worker.min.js` 增加了对 `{code,data}` 语言对象的兼容（原版仅回退到 `data` 字段）。
+  3. Worker 和 WASM 引导脚本嵌入一个 Blob Worker，避免 Chromium 阻止 Worker 导入 `file://` 脚本。
 - 首次识别才懒加载 OCR 资源；加载失败（旧 WebView、受限环境）会自动降级到共享模板分类器，功能仍可用。
-- 单文件核心 + 内嵌语言包使 Web/Android/iOS 资源增量约 6–7 MB，APK 约 3.8 MB。
+- 发布包不重复携带原始 Worker 和 WASM 引导文件；使用生成的离线 Worker。实际包大小以交付件为准。
 
 ### 微信小程序
 
@@ -67,4 +68,4 @@ V12 新增：从图片识别 9×9 数独并直接载入棋盘，与原有 81 字
 
 - `npm test`：OCR 几何、81 格映射、合法性校验、三种图片（正拍/旋转/透视）端到端识别、平台入口与离线资源检查。
 - `node scripts/verify-ocr-browser.js`：用 Chromium 以 `file://` 打开真实页面，上传透视图片，断言棋盘与预期题面完全一致且未降级到模板分类器。
-- 当前 Linux 环境无 Android 模拟器、微信开发者工具与 Xcode，三端相机 GUI 仍需在对应环境做最终真机/模拟器验收。
+- Android 真机相机、微信开发者工具和 iOS 模拟器交互仍需在对应设备环境验收。

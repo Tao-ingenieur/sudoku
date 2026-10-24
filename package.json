@@ -22,7 +22,7 @@
     "sync:android": "node scripts/sync-platforms.js android",
     "sync:ios": "node scripts/sync-platforms.js ios",
     "ios:sync": "npm run sync:ios",
-    "desktop:pack": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --win nsis portable --x64",
+    "desktop:pack": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --win nsis portable --x64 --publish never && node scripts/verify-desktop.js",
     "desktop:dir": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --dir",
     "android:build": "node scripts/build-android.js",
     "dist:assets": "node scripts/release.js assets",

@@ -22,7 +22,7 @@ npm run test:coverage
 | `test/features.test.js` | 4 | 回放快照/持久化、统计计数/最快/平均/难度分桶 |
 | `test/ui-features.test.js` | 2 | 网页/小程序回放、统计、擦除与三主题静态完整性 |
 | `test/wechat.test.js` | 4 | 小程序结构、共享核心字节一致、WXML/WXSS、Page/wx 模拟页面流程 |
-| `test/mobile.test.js` | 3 | 所有平台生成资源一致、Android APK/Manifest/WebView、iOS Capacitor 工程 |
+| `test/mobile.test.js` | 3 | 所有平台生成资源一致、Android Manifest/WebView、iOS Capacitor 工程 |
 | `test/ocr.test.js` | 8 | 正拍/旋转/透视端到端识别、无棋盘、重复线索、81 格映射、离线资源与微信入口 |
 
 总计 **77** 个测试。

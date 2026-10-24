@@ -30,10 +30,13 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run dist:android
+      - id: dist
+        run: node -e "require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'path=' + require('path').resolve('../dist') + '\n')"
       - uses: actions/upload-artifact@v4
         with:
           name: sudoku-android-and-assets
-          path: ../dist/
+          path: ${{ steps.dist.outputs.path }}
+          include-hidden-files: true
           if-no-files-found: error
   windows:
     runs-on: windows-2022
@@ -45,8 +48,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run dist:win
+      - id: dist
+        run: node -e "require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'path=' + require('path').resolve('../dist') + '\n')"
       - uses: actions/upload-artifact@v4
         with:
           name: sudoku-windows-and-assets
-          path: ../dist/
+          path: ${{ steps.dist.outputs.path }}
+          include-hidden-files: true
           if-no-files-found: error
