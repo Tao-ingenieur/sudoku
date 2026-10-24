@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.sudokuacademy.app'
     compileSdk 35
+    buildToolsVersion '35.0.0'
 
     defaultConfig {
         applicationId "com.sudokuacademy.app"
