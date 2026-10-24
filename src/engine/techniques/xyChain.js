@@ -16,7 +16,7 @@
       const bivalueSet = new Set(bivalue);
       const peerBivalue = new Map();
       for (const cell of bivalue) {
-        peerBivalue.set(cell, H.PEERS_FOR_TEST ? [] : core.PEERS[cell].filter((p) => bivalueSet.has(p)));
+        peerBivalue.set(cell, core.PEERS[cell].filter((p) => bivalueSet.has(p)));
       }
       let nodes = 0;
       const NODE_LIMIT = 70000;

@@ -79,4 +79,4 @@ function main(mode = process.argv[2] || 'all') {
   return mode === 'all' ? verifyCopies() : 0;
 }
 if (require.main === module) process.exitCode = main();
-module.exports = { ROOT, WEB, sourceWebFiles, wechatSourceFiles, verifyCopies, checkCopies: verifyCopies, copyWebAssets, copyWechatCore, main };
+module.exports = { wechatSourceFiles, verifyCopies, main };

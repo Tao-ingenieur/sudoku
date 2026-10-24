@@ -13,7 +13,6 @@
     "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
     "test:ocr-browser": "node scripts/verify-ocr-browser.js",
     "start": "npm run sync:web && electron .",
-    "desktop:dev": "npm start",
     "build:locales": "node scripts/build-locales.js",
     "sync:platforms": "node scripts/sync-platforms.js all",
     "sync:check": "node scripts/sync-platforms.js check",
@@ -21,7 +20,6 @@
     "sync:wechat": "node scripts/sync-platforms.js wechat",
     "sync:android": "node scripts/sync-platforms.js android",
     "sync:ios": "node scripts/sync-platforms.js ios",
-    "ios:sync": "npm run sync:ios",
     "desktop:pack": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --win nsis portable --x64 --publish never && node scripts/verify-desktop.js",
     "desktop:dir": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --dir",
     "android:build": "node scripts/build-android.js",
@@ -33,15 +31,11 @@
     "serve": "node scripts/serve.js"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.3",
-    "@capacitor/core": "^8.5.3",
-    "@capacitor/ios": "^8.5.3",
-    "@electron/packager": "^20.3.0",
+    "@electron/asar": "4.3.1",
     "electron": "^45.0.0",
     "electron-builder": "^26.15.3",
     "pngjs": "^7.0.0",
-    "puppeteer-core": "^24.43.1",
-    "tesseract.js": "^7.0.0"
+    "puppeteer-core": "^24.43.1"
   },
   "engines": {
     "node": ">=22.12.0"

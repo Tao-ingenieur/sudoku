@@ -61,7 +61,7 @@ Windows 安装包未配置代码签名。
 - 用 Xcode 打开 `../dist/ios/App/App.xcodeproj`，运行 App Scheme。
 - 用微信开发者工具导入 `../dist/wechat/`；真机预览需设置自己的 AppID。
 - 修改 UI 源码分别位于 `platforms/ios/`、`platforms/wechat/`，再重新生成交付件。
-- `config/capacitor.config.json` 集中保存 Capacitor 配置；项目日常资源同步使用
+- `platforms/ios/App/App/capacitor.config.json` 保存 iOS 运行配置；日常资源同步使用
   `npm run sync:ios`，不依赖在仓库根目录运行 Capacitor CLI。
 
 ## 可复现性与检查
@@ -96,3 +96,5 @@ iOS CI 不编译，交付 Xcode 工程。源码快照不包含以前开发环境
 项目文档按职责维护：用户操作见 [USER_GUIDE.md](USER_GUIDE.md)，共享模块和平台适配见
 [ARCHITECTURE.md](ARCHITECTURE.md)，测试与设备检查见 [TESTING.md](TESTING.md)。
 每个平台交付目录的 README 来自 `docs/release/` 模板，应在这里修改后重新生成。
+
+iOS 的 Capacitor 依赖由 `platforms/ios/App/CapApp-SPM/Package.swift` 精确指定并由 Xcode/SwiftPM 获取；不需要 npm Capacitor CLI 或 CocoaPods 占位工程。OCR 使用仓库内的固定版本资源作为构建输入，不在安装 npm 依赖时重新获取引擎。

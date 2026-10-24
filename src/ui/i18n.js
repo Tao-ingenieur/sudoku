@@ -1,5 +1,5 @@
 /*
- * Global translation utility. All copy lives in locales/*.json and is embedded
+ * Global translation utility. All copy lives in src/locales/*.json and is embedded
  * by scripts/build-locales.js so the app can run from file:// and inside the
  * WeChat mini program without fetch().
  */
@@ -198,7 +198,6 @@
   }
 
   return {
-    STRINGS: LOCALES,
     LOCALES,
     LANGUAGES,
     TECHNIQUES,

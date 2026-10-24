@@ -37,8 +37,7 @@ test('iOS project is a Capacitor Xcode project with shared public assets', () =>
   assert.ok(fs.existsSync(path.join(ROOT, 'platforms/ios/App/App.xcodeproj/project.pbxproj')));
   assert.ok(fs.existsSync(path.join(ROOT, 'platforms/ios/App/App.xcodeproj/xcshareddata/xcschemes/App.xcscheme')));
   assert.ok(fs.existsSync(path.join(ROOT, 'platforms/ios/App/CapApp-SPM/Package.swift')));
-  const config = JSON.parse(read('config/capacitor.config.json'));
-  assert.equal(config.webDir, '../.build/web');
+  const config = JSON.parse(read('platforms/ios/App/App/capacitor.config.json'));
   assert.equal(config.appId, 'com.sudokuacademy.app');
   const pbx = read('platforms/ios/App/App.xcodeproj/project.pbxproj');
   assert.match(pbx, /com\.sudokuacademy\.app/);

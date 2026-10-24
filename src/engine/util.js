@@ -13,11 +13,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (core) {
   'use strict';
 
-  const { PEER_SETS, UNITS, bit, countBits, digits } = core;
-
-  function cellName(cell) {
-    return 'R' + (core.rowOf(cell) + 1) + 'C' + (core.colOf(cell) + 1);
-  }
+  const { PEER_SETS, UNITS, bit, digits } = core;
 
   // Language-neutral references consumed by i18n.formatVars().
   const refCell = (index) => ({ kind: 'cell', index });
@@ -59,25 +55,6 @@
         out.get(digit).push(cell);
       }
     }
-    return out;
-  }
-
-  /** Cartesian positions for choosing k items out of n. */
-  function combinations(n, k) {
-    const out = [];
-    const chosen = [];
-    function walk(start) {
-      if (chosen.length === k) {
-        out.push(chosen.slice());
-        return;
-      }
-      for (let i = start; i <= n - (k - chosen.length); i++) {
-        chosen.push(i);
-        walk(i + 1);
-        chosen.pop();
-      }
-    }
-    walk(0);
     return out;
   }
 
@@ -134,14 +111,10 @@
     }, extra || {}));
   }
 
-  function candidateCount(cands) {
-    return countBits(cands);
-  }
-
   return {
-    cellName, refCell, refCells, refDigits, refCands, refUnit, refUnits, refChain,
+    refCell, refCells, refDigits, refCands, refUnit, refUnits, refChain,
     sees, commonPeers, positionsInUnit, cellsInUnit, digitMasksInUnit,
-    combinations, uniqueEliminations, highlightedCandidates,
-    makeStep, placementStep, candidateCount,
+    uniqueEliminations, highlightedCandidates,
+    makeStep, placementStep,
   };
 });

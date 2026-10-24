@@ -8,10 +8,6 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (core, H) {
   'use strict';
 
-  function lineCells(baseType, index) {
-    return core.UNITS[baseType === 'row' ? core.ROW_UNITS[index] : core.COL_UNITS[index]];
-  }
-
   function coverIndex(baseType, cell) {
     return baseType === 'row' ? core.colOf(cell) : core.rowOf(cell);
   }

@@ -9,7 +9,7 @@ Bundled third-party components retain their own licenses.
 | Tesseract.js-core | 6.x, vendored WASM runtime | Apache-2.0 | same directory |
 | English language model | tessdata_fast 4.0.0, `eng.traineddata.gz` | Apache-2.0 | same directory |
 | Electron / Chromium | Locked in package-lock.json | MIT and bundled third-party licenses | Windows runtime LICENSE.electron.txt and LICENSES.chromium.html |
-| Capacitor | 8.5.3 | MIT | Resolved package / SwiftPM dependency |
+| Capacitor | 8.5.3 | MIT | SwiftPM dependency |
 | Gradle Wrapper | Gradle 8.9 | Apache-2.0 | Wrapper source headers |
 
 The vendored Tesseract worker has a local compatibility patch: embedded language

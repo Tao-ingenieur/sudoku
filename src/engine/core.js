@@ -15,7 +15,6 @@
   const SIZE = 9;
   const CELLS = 81;
   const ALL = 0x1ff; // bits 1..9
-  const EMPTY = 0;
 
   const rowOf = (i) => (i / 9) | 0;
   const colOf = (i) => i % 9;
@@ -66,12 +65,8 @@
   const ROW_UNITS = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   const COL_UNITS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
   const BOX_UNITS = [18, 19, 20, 21, 22, 23, 24, 25, 26];
-  const ROWS = ROW_UNITS.map((u) => UNITS[u]);
-  const COLS = COL_UNITS.map((u) => UNITS[u]);
-  const BOXES = BOX_UNITS.map((u) => UNITS[u]);
 
   function bit(digit) { return 1 << (digit - 1); }
-  function has(mask, digit) { return (mask & bit(digit)) !== 0; }
   function countBits(mask) {
     let count = 0;
     while (mask) { mask &= mask - 1; count++; }
@@ -86,12 +81,6 @@
     for (let d = 1; d <= 9; d++) if (mask & bit(d)) return d;
     return 0;
   }
-  function maskFromDigits(list) {
-    let mask = 0;
-    list.forEach((d) => { mask |= bit(d); });
-    return mask;
-  }
-
   /** Accept 81 cells made of 1-9, 0, . or -; whitespace is ignored. */
   function parse(text) {
     if (typeof text !== 'string') throw new Error('Puzzle must be a string');
@@ -258,11 +247,11 @@
   }
 
   return {
-    SIZE, CELLS, ALL, EMPTY,
+    SIZE, CELLS, ALL,
     idx, rowOf, colOf, boxOf,
     UNITS, UNIT_NAMES, CELL_UNITS, PEERS, PEER_SETS,
-    ROW_UNITS, COL_UNITS, BOX_UNITS, ROWS, COLS, BOXES,
-    bit, has, countBits, digits, lowestDigit, maskFromDigits,
+    ROW_UNITS, COL_UNITS, BOX_UNITS,
+    bit, countBits, digits, lowestDigit,
     parse, fromRows, toRows, toPuzzleString,
     conflicts, isValid, isSolved, candidates, validate,
     countSolutions, solve, difficultyForTier,
