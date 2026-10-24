@@ -1,7 +1,7 @@
-node_modules/
-.build/
-dist/
-release/
+/node_modules/
+/.build/
+/dist/
+/release/
 src/ui/locales-data.js
 web/assets/vendor/tesseract/eng-data.js
 web/assets/vendor/tesseract/worker-bundle.js
