@@ -1,0 +1,49 @@
+{
+  "name": "sudoku-academy",
+  "version": "12.0.0",
+  "private": true,
+  "description": "Teaching Sudoku \u2014 play, construct and learn with offline photo import, step-by-step human logic and six languages.",
+  "main": "platforms/desktop/main.js",
+  "author": "sudoku-dev",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "node scripts/sync-platforms.js all",
+    "test": "node scripts/test.js",
+    "test:watch": "node --test --watch test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
+    "test:ocr-browser": "node scripts/verify-ocr-browser.js",
+    "start": "npm run sync:web && electron .",
+    "desktop:dev": "npm start",
+    "build:locales": "node scripts/build-locales.js",
+    "sync:platforms": "node scripts/sync-platforms.js all",
+    "sync:check": "node scripts/sync-platforms.js check",
+    "sync:web": "node scripts/sync-platforms.js web",
+    "sync:wechat": "node scripts/sync-platforms.js wechat",
+    "sync:android": "node scripts/sync-platforms.js android",
+    "sync:ios": "node scripts/sync-platforms.js ios",
+    "ios:sync": "npm run sync:ios",
+    "desktop:pack": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --win nsis portable --x64",
+    "desktop:dir": "npm run sync:web && node scripts/build-icon.js && electron-builder --config config/electron-builder.json --dir",
+    "android:build": "node scripts/build-android.js",
+    "dist:assets": "node scripts/release.js assets",
+    "dist:win": "npm test && node scripts/release.js windows",
+    "dist:android": "npm test && node scripts/release.js android",
+    "dist": "npm test && node scripts/release.js all",
+    "dist:verify": "node scripts/release.js verify",
+    "serve": "node scripts/serve.js"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@electron/packager": "^20.3.0",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^24.43.1",
+    "tesseract.js": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

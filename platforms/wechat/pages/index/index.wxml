@@ -1,0 +1,473 @@
+<template name="board">
+  <view class="board" style="width:{{boardSize}}px;height:{{boardSize}}px">
+    <view
+      wx:for="{{cells}}"
+      wx:key="index"
+      class="{{item.cls}}"
+      style="width:{{cellSize}}px;height:{{cellSize}}px;font-size:{{valueFont}}px"
+      data-index="{{index}}"
+      bindtap="onBoardTap"
+    >
+      <text wx:if="{{item.value}}" class="cell-value">{{item.value}}</text>
+      <view wx:else class="notes" style="font-size:{{noteFont}}px">
+        <text wx:for="{{item.notes}}" wx:for-item="n" wx:key="d" class="{{n.cls}}">{{n.d}}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<view class="page theme-{{theme}}">
+  <view class="hero">
+    <view class="brand">
+      <view class="brand-mark"><text>9</text></view>
+      <view class="brand-copy">
+        <text class="brand-title">{{labels.appTitle}}</text>
+        <text class="brand-tagline">{{labels.tagline}}</text>
+      </view>
+    </view>
+    <view class="hero-actions">
+      <button class="lang-btn theme-btn" bindtap="cycleTheme" aria-label="{{labels.themeToggle}}">{{themeIcon}}</button>
+      <picker mode="selector" range="{{languages}}" range-key="label" value="{{langIndex}}" bindchange="onLanguageChange">
+        <view class="lang-btn lang-picker">{{languageLabel}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tab {{activeTab == item.key ? 'active' : ''}}"
+      data-tab="{{item.key}}"
+      bindtap="switchTab"
+    >{{item.label}}</view>
+  </view>
+
+  <!-- ================================ PLAY ================================ -->
+  <block wx:if="{{activeTab == 'play'}}">
+    <view class="section-head">
+      <text class="section-title">{{labels.playTitle}}</text>
+      <text class="section-sub">{{labels.playSubtitle}}</text>
+    </view>
+
+    <view class="segmented">
+      <view
+        wx:for="{{difficulties}}"
+        wx:key="key"
+        class="seg-btn {{play.targetDifficulty == item.key ? 'active' : ''}}"
+        data-difficulty="{{item.key}}"
+        bindtap="setDifficulty"
+      >{{item.label}}</view>
+    </view>
+
+    <view class="toolbar card">
+      <view class="metric">
+        <text class="metric-label">{{labels.difficulty}}</text>
+        <text class="metric-value">{{play.difficultyLabel}}</text>
+      </view>
+      <view class="metric">
+        <text class="metric-label">{{labels.timer}}</text>
+        <text class="metric-value mono">{{play.timeText}}</text>
+      </view>
+      <view class="metric">
+        <text class="metric-label">{{labels.clues}}</text>
+        <text class="metric-value">{{play.clues}}</text>
+      </view>
+      <view class="toolbar-spacer"></view>
+      <button class="btn ghost small" bindtap="onPause" disabled="{{play.finished}}">{{play.paused ? labels.resume : labels.pause}}</button>
+      <button class="btn primary small" bindtap="newPuzzle">{{labels.newPuzzle}}</button>
+    </view>
+
+    <view class="board-shell">
+      <template is="board" data="{{cells: play.cells, boardSize: boardSize, cellSize: cellSize, valueFont: valueFont, noteFont: noteFont}}" />
+    </view>
+    <text class="hint-line">{{labels.playSubtitle}}</text>
+
+    <view class="card status-card">
+      <view class="status-line">
+        <view class="dot {{play.status.tone}}"></view>
+        <text class="status-title">{{play.status.title}}</text>
+      </view>
+      <text class="muted">{{play.status.detail}}</text>
+      <view class="divider"></view>
+      <view class="meta-row">
+        <view>
+          <text class="metric-label">{{labels.techniqueLevel}}</text>
+          <text class="metric-value">{{play.ratingLabel}}</text>
+        </view>
+        <text class="chip">{{play.techniqueLabel}}</text>
+      </view>
+      <view class="stat-row">
+        <view><text class="muted">{{labels.filledLabel}}</text><text class="stat-value">{{play.filled}} / 81</text></view>
+        <view><text class="muted">{{labels.notesLabel}}</text><text class="stat-value">{{play.notesCount}}</text></view>
+      </view>
+    </view>
+
+    <view class="card control-card">
+      <view class="control-row">
+        <button class="toggle {{play.notesMode ? 'on' : ''}}" bindtap="toggleNotes">
+          <view class="knob"></view><text>{{labels.notesMode}}</text>
+        </button>
+        <picker range="{{play.errorLabels}}" value="{{play.errorIndex}}" bindchange="onErrorMode">
+          <view class="picker">{{labels.errorMode}} · {{play.errorLabels[play.errorIndex]}}</view>
+        </picker>
+      </view>
+
+      <view class="numpad">
+        <button
+          wx:for="{{play.numCounts}}"
+          wx:key="digit"
+          class="num-btn {{item.done ? 'done' : ''}}"
+          data-digit="{{item.digit}}"
+          bindtap="onPadTap"
+        >{{item.digit}}<text class="count">{{item.left}}</text></button>
+      </view>
+
+      <view class="actions">
+        <button class="btn ghost small" bindtap="onUndo" disabled="{{play.finished}}">{{labels.undo}}</button>
+        <button class="btn ghost small" bindtap="erasePlay" disabled="{{play.finished}}">{{labels.erase}}</button>
+        <button class="btn ghost small" bindtap="onHint" disabled="{{play.finished}}">{{labels.hint}}</button>
+        <button class="btn ghost small" bindtap="onCheck" disabled="{{play.finished}}">{{labels.check}}</button>
+        <button class="btn ghost small" bindtap="onRestart">{{labels.restart}}</button>
+        <button class="btn ghost small" bindtap="onReveal" disabled="{{play.finished}}">{{labels.reveal}}</button>
+      </view>
+
+      <view wx:if="{{play.hint}}" class="hint-card">
+        <view class="hint-head">
+          <text class="chip accent">{{play.hint.technique}} · {{play.hint.tier}}</text>
+          <text class="close" bindtap="closeHint">×</text>
+        </view>
+        <text class="hint-text">{{play.hint.text}}</text>
+        <button class="btn primary small" bindtap="applyHint">{{labels.hintApply}}</button>
+      </view>
+
+      <button class="btn outline full" data-mode="play" bindtap="openIO">{{labels.importExport}}</button>
+      <button class="btn primary full" bindtap="openOcr">📷 {{labels.ocrOpen}}</button>
+    </view>
+  </block>
+
+  <!-- ============================= CONSTRUCTOR ============================= -->
+  <block wx:if="{{activeTab == 'constructor'}}">
+    <view class="section-head">
+      <text class="section-title">{{labels.conTitle}}</text>
+      <text class="section-sub">{{labels.conSubtitle}}</text>
+    </view>
+
+    <view class="row-actions">
+      <button class="btn ghost small" bindtap="conExample">{{labels.conExample}}</button>
+      <button class="btn ghost small" bindtap="conClear">{{labels.conClear}}</button>
+      <button class="btn primary small" bindtap="conStart" disabled="{{!con.startEnabled}}">{{labels.conStart}}</button>
+    </view>
+
+    <view class="board-shell">
+      <template is="board" data="{{cells: con.cells, boardSize: boardSize, cellSize: cellSize, valueFont: valueFont, noteFont: noteFont}}" />
+    </view>
+
+    <view class="card status-card">
+      <view class="status-line">
+        <view class="dot {{con.status.tone}}"></view>
+        <text class="status-title">{{con.status.title}}</text>
+      </view>
+      <text class="muted">{{con.status.detail}}</text>
+      <view class="divider"></view>
+      <view class="stat-row">
+        <view><text class="muted">{{labels.conClues}}</text><text class="stat-value">{{con.clues}}</text></view>
+        <view><text class="muted">{{labels.conEmpty}}</text><text class="stat-value">{{con.empty}}</text></view>
+      </view>
+      <view class="note-card">
+        <text class="metric-label">{{labels.conStatus}}</text>
+        <text class="metric-value">{{con.note}}</text>
+      </view>
+    </view>
+
+    <view class="card control-card">
+      <view class="control-row">
+        <button class="toggle {{con.notesMode ? 'on' : ''}}" bindtap="toggleConNotes">
+          <view class="knob"></view><text>{{labels.conNotes}}</text>
+        </button>
+        <text class="muted tiny">{{labels.conSubtitle}}</text>
+      </view>
+      <view class="numpad">
+        <button
+          wx:for="{{con.numCounts}}"
+          wx:key="digit"
+          class="num-btn {{item.done ? 'done' : ''}}"
+          data-digit="{{item.digit}}"
+          bindtap="onConPad"
+        >{{item.digit}}<text class="count">{{item.left}}</text></button>
+      </view>
+      <view class="actions two">
+        <button class="btn ghost small" bindtap="eraseCon">{{labels.erase}}</button>
+        <button class="btn ghost small" data-mode="constructor" bindtap="openIO">{{labels.conPaste}}</button>
+      </view>
+      <button class="btn outline full" data-mode="constructor" bindtap="openIO">{{labels.importExport}}</button>
+    </view>
+  </block>
+
+  <!-- =============================== SOLVER =============================== -->
+  <block wx:if="{{activeTab == 'solver'}}">
+    <view class="section-head">
+      <text class="section-title">{{labels.solverTitle}}</text>
+      <text class="section-sub">{{labels.solverSubtitle}}</text>
+    </view>
+
+    <view class="card source-card">
+      <text class="metric-label">{{labels.solverSource}}</text>
+      <input class="source-input" value="{{solver.input}}" bindinput="setSolverInput" placeholder="{{labels.solverPlaceholder}}" />
+      <view class="actions two">
+        <button class="btn ghost small" bindtap="solverLoadCurrent">{{labels.solverCurrent}}</button>
+        <button class="btn ghost small" bindtap="solverLoadExample">{{labels.solverExample}}</button>
+      </view>
+      <button class="btn primary full" bindtap="startSolver">{{labels.solverStart}}</button>
+      <text wx:if="{{solver.warning}}" class="warning">{{solver.warning}}</text>
+    </view>
+
+    <view class="toolbar card" wx:if="{{!solver.idle}}">
+      <view class="metric">
+        <text class="metric-label">{{labels.solverDifficulty}}</text>
+        <text class="metric-value">{{solver.difficulty}}</text>
+      </view>
+      <view class="metric">
+        <text class="metric-label">{{labels.solverClueCount}}</text>
+        <text class="metric-value">{{solver.clues}}</text>
+      </view>
+      <view class="toolbar-spacer"></view>
+      <text class="chip">{{solver.counter}}</text>
+    </view>
+
+    <view class="board-shell" wx:if="{{!solver.idle}}">
+      <template is="board" data="{{cells: solver.cells, boardSize: boardSize, cellSize: cellSize, valueFont: valueFont, noteFont: noteFont}}" />
+    </view>
+
+    <view class="card playback" wx:if="{{!solver.idle}}">
+      <slider min="0" max="{{solver.max}}" value="{{solver.index}}" activeColor="#0f766e" backgroundColor="#dbe1e7" block-size="18" bindchange="solverSlider" />
+      <view class="actions three">
+        <button class="btn ghost small" bindtap="solverPrev" disabled="{{!solver.canPrev}}">{{labels.solverPrev}}</button>
+        <button class="btn ghost small" bindtap="solverNext" disabled="{{!solver.canNext}}">{{labels.solverNext}}</button>
+        <button class="btn outline small" bindtap="toggleAutoplay">{{solver.autoplay ? labels.solverStop : labels.solverAutoplay}}</button>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{!solver.idle}}">
+      <view class="explain-head">
+        <view>
+          <text class="metric-label">{{labels.solverTechnique}}</text>
+          <text class="explain-title">{{solver.technique}}</text>
+        </view>
+        <text wx:if="{{solver.tier}}" class="chip tier">{{solver.tier}}</text>
+        <text wx:if="{{solver.solvedChip}}" class="chip good">{{solver.solvedChip}}</text>
+      </view>
+      <view class="divider"></view>
+      <text class="metric-label">{{labels.solverExplanation}}</text>
+      <text class="explain-text">{{solver.explanation}}</text>
+      <text class="legend">{{labels.solverSubtitle}}</text>
+    </view>
+
+    <view class="card" wx:if="{{!solver.idle}}">
+      <text class="card-title">{{labels.solverSummary}}</text>
+      <view class="counts">
+        <text wx:for="{{solver.counts}}" wx:key="id" class="chip count-chip">{{item.name}} × {{item.count}}</text>
+        <text wx:if="{{solver.counts.length == 0}}" class="muted">—</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{!solver.idle}}">
+      <text class="card-title">{{labels.solverSteps}}</text>
+      <scroll-view scroll-y class="step-scroll">
+        <view
+          wx:for="{{solver.steps}}"
+          wx:key="index"
+          class="step-item {{item.active ? 'active' : ''}}"
+          data-index="{{item.index}}"
+          bindtap="solverStepTap"
+        >
+          <text class="step-no">{{item.no}}</text>
+          <text class="step-name">{{item.name}}</text>
+          <text class="step-tier">{{item.tier}}</text>
+        </view>
+      </scroll-view>
+      <text class="muted tiny">{{labels.solverSelectStep}}</text>
+    </view>
+  </block>
+
+  <!-- ================================ REPLAY ============================= -->
+  <block wx:if="{{activeTab == 'replay'}}">
+    <view class="section-head">
+      <text class="section-title">{{labels.replayTitle}}</text>
+      <text class="section-sub">{{labels.replaySubtitle}}</text>
+    </view>
+
+    <view class="card toolbar">
+      <view class="metric">
+        <text class="metric-label">{{labels.difficulty}}</text>
+        <text class="metric-value">{{replay.diff}}</text>
+      </view>
+      <view class="metric">
+        <text class="metric-label">{{labels.replayOperations}}</text>
+        <text class="metric-value">{{replay.operations}}</text>
+      </view>
+      <view class="metric">
+        <text class="metric-label">{{labels.replayDuration}}</text>
+        <text class="metric-value">{{replay.duration}}</text>
+      </view>
+      <view class="toolbar-spacer"></view>
+      <text class="chip">{{replay.counter}}</text>
+    </view>
+
+    <view class="board-shell" wx:if="{{!replay.empty}}">
+      <template is="board" data="{{cells: replay.cells, boardSize: boardSize, cellSize: cellSize, valueFont: valueFont, noteFont: noteFont}}" />
+    </view>
+
+    <view class="card playback">
+      <slider min="0" max="{{replay.max}}" value="{{replay.index}}" activeColor="#0f766e" backgroundColor="#dbe1e7" block-size="18" bindchange="onReplaySlider" />
+      <view class="actions three">
+        <button class="btn ghost small" bindtap="replayPrev" disabled="{{!replay.canPrev}}">{{labels.replayPrev}}</button>
+        <button class="btn primary small" bindtap="toggleReplayPlayback" disabled="{{replay.empty}}">{{replay.playing ? labels.replayPause : labels.replayPlay}}</button>
+        <button class="btn ghost small" bindtap="replayNext" disabled="{{!replay.canNext}}">{{labels.replayNext}}</button>
+      </view>
+      <text class="hint-line">{{replay.action}}</text>
+    </view>
+
+    <view class="card">
+      <view class="summary-head">
+        <text class="card-title">{{labels.replayHistory}}</text>
+        <text class="chip">{{replay.records.length}}</text>
+      </view>
+      <view wx:if="{{replay.empty}}" class="empty-state">{{labels.replayEmpty}}</view>
+      <view wx:else class="replay-list">
+        <button
+          wx:for="{{replay.records}}"
+          wx:key="id"
+          class="replay-item {{item.active ? 'active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="selectReplay"
+        >
+          <view class="replay-item-head"><text>{{item.title}}</text><text class="chip">{{item.difficulty}}</text></view>
+          <text class="replay-item-meta">{{item.meta}}</text>
+        </button>
+      </view>
+      <text class="muted tiny">{{labels.replaySavedLocally}}</text>
+    </view>
+  </block>
+
+  <!-- ================================ STATS ============================== -->
+  <block wx:if="{{activeTab == 'stats'}}">
+    <view class="section-head">
+      <text class="section-title">{{labels.statsTitle}}</text>
+      <text class="section-sub">{{labels.statsSubtitle}}</text>
+    </view>
+    <view class="row-actions">
+      <button class="btn ghost small" bindtap="resetStats">{{labels.statsReset}}</button>
+    </view>
+
+    <view class="stats-hero card">
+      <text class="metric-label">{{labels.statsCompleted}}</text>
+      <text class="stats-total">{{stats.total}}</text>
+      <text class="chip">{{labels.statsLocalOnly}}</text>
+    </view>
+    <view class="stats-pair">
+      <view class="card stat-mini">
+        <text class="metric-label">{{labels.statsFastest}}</text>
+        <text class="stat-big">{{stats.fastest}}</text>
+      </view>
+      <view class="card stat-mini">
+        <text class="metric-label">{{labels.statsAverage}}</text>
+        <text class="stat-big">{{stats.average}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="card-title">{{labels.statsByDifficulty}}</text>
+      <view wx:for="{{stats.rows}}" wx:key="key" class="stats-row">
+        <text class="stats-row-name">{{item.label}}</text>
+        <view class="stats-row-values"><text>{{item.count}}</text><text wx:if="{{item.detail}}" class="muted tiny">{{item.detail}}</text></view>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="card-title">{{labels.statsRecent}}</text>
+      <view wx:if="{{stats.empty}}" class="empty-state">{{labels.statsNoData}}</view>
+      <view wx:else class="stats-recent">
+        <view wx:for="{{stats.recent}}" wx:key="id" class="stats-recent-row">
+          <text class="chip">{{item.difficulty}}</text>
+          <text class="stat-time">{{item.time}}</text>
+          <text class="muted tiny">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ================================ MODALS ============================= -->
+  <view wx:if="{{io.visible}}" class="overlay" catchtouchmove="noop" bindtap="closeIO">
+    <view class="modal" catchtap="noop">
+      <view class="modal-head">
+        <text class="modal-title">{{labels.ioTitle}}</text>
+        <text class="close" bindtap="closeIO">×</text>
+      </view>
+      <text class="muted tiny">{{labels.ioHint}}</text>
+      <view wx:if="{{io.mode == 'play'}}" class="ocr-entry">
+        <button class="btn outline small full" bindtap="openOcr">📷 {{labels.ocrOpen}}</button>
+        <text class="muted tiny center">{{labels.ocrOffline}}</text>
+      </view>
+      <input class="io-input" value="{{io.text}}" bindinput="onIoInput" maxlength="120" />
+      <text wx:if="{{io.error}}" class="form-error">{{io.error}}</text>
+      <view class="actions two">
+        <button class="btn ghost small" bindtap="pasteIO">{{labels.paste}}</button>
+        <button class="btn primary small" bindtap="importIO">{{labels.importAction}}</button>
+      </view>
+      <view class="actions two">
+        <button class="btn ghost small" data-kind="puzzle" bindtap="copyIO">{{labels.exportPuzzle}}</button>
+        <button class="btn ghost small" data-kind="current" bindtap="copyIO">{{labels.exportCurrent}}</button>
+      </view>
+      <button wx:if="{{io.mode == 'play'}}" class="btn ghost small full" data-kind="solution" bindtap="copyIO">{{labels.exportSolution}}</button>
+    </view>
+  </view>
+
+  <view wx:if="{{ocr.visible}}" class="overlay" catchtouchmove="noop" bindtap="closeOcr">
+    <view class="modal ocr-modal" catchtap="noop">
+      <view class="modal-head">
+        <text class="modal-title">{{labels.ocrTitle}}</text>
+        <text class="close" bindtap="closeOcr">×</text>
+      </view>
+      <text class="muted tiny">{{labels.ocrDesc}}</text>
+      <view class="ocr-guide">
+        <text>• {{labels.ocrGuideAlign}}</text>
+        <text>• {{labels.ocrGuideLight}}</text>
+        <text>• {{labels.ocrGuideFocus}}</text>
+      </view>
+      <image wx:if="{{ocr.preview}}" class="ocr-preview" src="{{ocr.preview}}" mode="aspectFit" />
+      <view wx:else class="ocr-placeholder">
+        <text>📷</text>
+        <text class="muted tiny">{{labels.ocrPreviewEmpty}}</text>
+      </view>
+      <text class="muted tiny center ocr-offline">{{labels.ocrOffline}}</text>
+      <view wx:if="{{ocr.busy}}" class="ocr-progress-row">
+        <text class="muted tiny">{{ocr.status}}</text>
+        <progress percent="{{ocr.progress}}" stroke-width="3" activeColor="#0f766e" backgroundColor="#dbe1e7" />
+      </view>
+      <text wx:if="{{ocr.error}}" class="form-error">{{ocr.error}}</text>
+      <view class="actions two">
+        <button class="btn primary small" bindtap="chooseOcrCamera" disabled="{{ocr.busy}}">{{labels.ocrCamera}}</button>
+        <button class="btn ghost small" bindtap="chooseOcrAlbum" disabled="{{ocr.busy}}">{{labels.ocrAlbum}}</button>
+      </view>
+      <button wx:if="{{ocr.error}}" class="btn ghost small full" bindtap="retryOcr" disabled="{{ocr.busy}}">{{labels.ocrRetry}}</button>
+    </view>
+  </view>
+
+  <view wx:if="{{win.visible}}" class="overlay" catchtouchmove="noop">
+    <view class="modal win-modal" catchtap="noop">
+      <view class="win-mark">✓</view>
+      <text class="win-title">{{labels.winTitle}}</text>
+      <text class="muted">{{labels.winSubtitle}}</text>
+      <view class="win-stats">
+        <view><text class="muted tiny">{{labels.timer}}</text><text class="stat-value">{{win.time}}</text></view>
+        <view><text class="muted tiny">{{labels.difficulty}}</text><text class="stat-value">{{win.difficulty}}</text></view>
+        <view><text class="muted tiny">{{labels.techniqueLevel}}</text><text class="stat-value">{{win.rating}}</text></view>
+      </view>
+      <view class="actions two">
+        <button class="btn ghost small" bindtap="closeWin">{{labels.winClose}}</button>
+        <button class="btn primary small" bindtap="winNew">{{labels.winNew}}</button>
+      </view>
+    </view>
+  </view>
+</view>

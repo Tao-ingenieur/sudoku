@@ -1,0 +1,29 @@
+{
+  "description": "Teaching Sudoku — WeChat mini program (offline, shared core)",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false,
+    "newFeature": true,
+    "coverView": true,
+    "showShadowRootInWxmlPanel": true,
+    "useCompilerPlugins": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.5.5",
+  "appid": "touristappid",
+  "projectname": "sudoku-academy-wechat",
+  "miniprogramRoot": "./",
+  "condition": {}
+}

@@ -1,0 +1,9 @@
+{
+  "desc": "Teaching Sudoku mini program — all pages are local and need no network.",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

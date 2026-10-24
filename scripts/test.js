@@ -1,0 +1,10 @@
+'use strict';
+const { spawnSync } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+const root = path.resolve(__dirname, '..');
+if (require('./sync-platforms.js').main('all')) process.exit(1);
+const files = fs.readdirSync(path.join(root,'test')).filter(f=>f.endsWith('.test.js')).sort().map(f=>'test/'+f);
+const result = spawnSync(process.execPath,['--test',...files],{cwd:root,stdio:'inherit'});
+if (result.error) throw result.error;
+process.exitCode = result.status ?? 1;

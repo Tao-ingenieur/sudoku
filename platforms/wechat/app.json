@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#0f766e",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f2f5f7",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.camera": {
+      "desc": "拍摄数独题目 / Photograph a Sudoku puzzle"
+    }
+  }
+}

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="">
+<title></title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f766e'/%3E%3Cg fill='none' stroke='white' stroke-width='3'%3E%3Cpath d='M10 10h44v44H10zM25 10v44M39 10v44M10 25h44M10 39h44'/%3E%3C/g%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="brand-copy">
+          <h1 data-i18n="app.title"></h1>
+          <p data-i18n="app.tagline"></p>
+        </div>
+      </div>
+      <nav class="main-nav" data-i18n-aria-label="nav.aria" role="tablist">
+        <button class="nav-btn active" data-tab="play" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span data-i18n="nav.play"></span>
+        </button>
+        <button class="nav-btn" data-tab="constructor" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="nav.constructor"></span>
+        </button>
+        <button class="nav-btn" data-tab="solver" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 15l4-5 4 3 4-6"/></svg><span data-i18n="nav.solver"></span>
+        </button>
+        <button class="nav-btn" data-tab="replay" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5"/></svg><span data-i18n="nav.replay"></span>
+        </button>
+        <button class="nav-btn" data-tab="stats" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="nav.stats"></span>
+        </button>
+      </nav>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" type="button" data-i18n-title="theme.toggle" data-i18n-aria-label="theme.toggle">
+          <span class="theme-icon" aria-hidden="true">◐</span>
+        </button>
+        <label class="lang-select-wrap">
+          <select class="lang-select" id="langSelect" data-i18n-aria-label="language.label"></select>
+        </label>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- ============================== PLAY ============================== -->
+      <section class="panel active" id="panel-play" role="tabpanel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="play.title"></h2>
+            <p data-i18n="play.subtitle"></p>
+          </div>
+          <div class="difficulty-switch" role="group" data-i18n-aria-label="play.difficulty">
+            <button class="diff-btn active" data-difficulty="easy" type="button">
+              <span data-i18n="play.difficulty.easy"></span>
+            </button>
+            <button class="diff-btn" data-difficulty="medium" type="button">
+              <span data-i18n="play.difficulty.medium"></span>
+            </button>
+            <button class="diff-btn" data-difficulty="hard" type="button">
+              <span data-i18n="play.difficulty.hard"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="play-layout">
+          <div class="board-column">
+            <div class="game-toolbar">
+              <div class="metric">
+                <span class="metric-label" data-i18n="play.difficulty"></span>
+                <strong id="playDiffValue">—</strong>
+              </div>
+              <div class="metric">
+                <span class="metric-label" data-i18n="play.timer"></span>
+                <strong id="timerDisplay" class="mono">00:00</strong>
+              </div>
+              <div class="metric">
+                <span class="metric-label" data-i18n="play.clues"></span>
+                <strong id="playClueValue">—</strong>
+              </div>
+              <div class="toolbar-spacer"></div>
+              <button class="btn ghost small" id="pauseBtn" type="button" data-i18n="common.pause"></button>
+              <button class="btn primary" id="newPuzzleBtn" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 8.5 12M12 3v6h6"/></svg>
+                <span data-i18n="play.new"></span>
+              </button>
+            </div>
+
+            <div class="board-wrap" id="playBoardWrap">
+              <div class="board play-board" id="playBoard" role="grid" data-i18n-aria-label="aria.board"></div>
+              <div class="board-overlay" id="playOverlay" hidden>
+                <div class="spinner"></div>
+                <h3 data-i18n="play.generating"></h3>
+                <p data-i18n="play.generating.detail"></p>
+              </div>
+            </div>
+
+            <p class="keyboard-hint" data-i18n="play.keyboard"></p>
+          </div>
+
+          <aside class="side-column">
+            <div class="card status-card">
+              <div class="status-line">
+                <span class="status-dot" id="playStatusDot"></span>
+                <strong id="playStatus"></strong>
+              </div>
+              <p class="muted" id="playStatusDetail"></p>
+              <div class="rating-box">
+                <div>
+                  <span class="metric-label" data-i18n="play.techniqueLevel"></span>
+                  <strong id="ratingValue">—</strong>
+                </div>
+                <span class="chip" id="ratingTechnique">—</span>
+              </div>
+              <dl class="stat-grid">
+                <div><dt data-i18n="play.stats.filled"></dt><dd id="playStatsFilled">0 / 81</dd></div>
+                <div><dt data-i18n="play.stats.notes"></dt><dd id="playStatsNotes">0</dd></div>
+              </dl>
+            </div>
+
+            <div class="card control-card">
+              <div class="control-row">
+                <button class="toggle-btn" id="notesToggle" type="button" aria-pressed="false">
+                  <span class="toggle-knob"></span>
+                  <span data-i18n="play.notes"></span>
+                </button>
+                <label class="select-label">
+                  <span data-i18n="play.errorMode"></span>
+                  <select id="errorMode">
+                    <option value="immediate" data-i18n="play.error.immediate"></option>
+                    <option value="check" data-i18n="play.error.check"></option>
+                    <option value="off" data-i18n="play.error.off"></option>
+                  </select>
+                </label>
+              </div>
+              <div class="numpad" id="playNumpad" data-i18n-aria-label="aria.numpad"></div>
+              <div class="action-grid">
+                <button class="btn ghost" id="undoBtn" type="button" data-i18n="play.undo"></button>
+                <button class="btn ghost" id="eraseBtn" type="button" data-i18n="play.erase"></button>
+                <button class="btn ghost" id="hintBtn" type="button" data-i18n="play.hint"></button>
+                <button class="btn ghost" id="checkBtn" type="button" data-i18n="play.check"></button>
+                <button class="btn ghost" id="restartBtn" type="button" data-i18n="play.restart"></button>
+                <button class="btn ghost" id="revealBtn" type="button" data-i18n="play.reveal"></button>
+              </div>
+              <div class="hint-card" id="hintCard" hidden>
+                <div class="hint-head">
+                  <span class="chip accent" id="hintTechnique">—</span>
+                  <button class="icon-btn small" id="hintClose" type="button" data-i18n-aria-label="common.close">×</button>
+                </div>
+                <p id="hintText"></p>
+                <button class="btn primary small" id="hintApply" type="button" data-i18n="play.hint.apply"></button>
+              </div>
+            </div>
+
+            <button class="btn outline full" id="importExportBtn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg>
+              <span data-i18n="play.import"></span>
+            </button>
+            <button class="btn primary full ocr-quick-btn" id="ocrQuickBtn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H7l1.2-2h7.6L17 6h1.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.5"/></svg>
+              <span data-i18n="ocr.open"></span>
+            </button>
+          </aside>
+        </div>
+      </section>
+
+      <!-- =========================== CONSTRUCTOR =========================== -->
+      <section class="panel" id="panel-constructor" role="tabpanel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="constructor.title"></h2>
+            <p data-i18n="constructor.subtitle"></p>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn ghost" id="conExampleBtn" type="button" data-i18n="constructor.example"></button>
+            <button class="btn ghost" id="conClearBtn" type="button" data-i18n="constructor.clear"></button>
+            <button class="btn primary" id="conStartBtn" type="button" disabled data-i18n="constructor.start"></button>
+          </div>
+        </div>
+
+        <div class="constructor-layout">
+          <div class="board-column">
+            <div class="board-wrap">
+              <div class="board constructor-board" id="conBoard" role="grid" data-i18n-aria-label="aria.board"></div>
+            </div>
+            <p class="keyboard-hint" data-i18n="play.keyboard"></p>
+          </div>
+          <aside class="side-column">
+            <div class="card status-card">
+              <div class="status-line">
+                <span class="status-dot" id="conStatusDot"></span>
+                <strong id="conStatus" data-i18n="status.empty"></strong>
+              </div>
+              <p class="muted" id="conStatusDetail" data-i18n="constructor.emptyHint"></p>
+              <div class="stat-pair">
+                <div><span class="metric-label" data-i18n="constructor.clues"></span><strong id="conClues">0</strong></div>
+                <div><span class="metric-label" data-i18n="constructor.emptyCells"></span><strong id="conEmpty">81</strong></div>
+              </div>
+            </div>
+            <div class="card control-card">
+              <div class="control-row">
+                <button class="toggle-btn" id="conNotesToggle" type="button" aria-pressed="false">
+                  <span class="toggle-knob"></span>
+                  <span data-i18n="constructor.notes"></span>
+                </button>
+              </div>
+              <p class="tiny muted" data-i18n="constructor.notesHint"></p>
+              <div class="numpad" id="conNumpad" data-i18n-aria-label="aria.numpad"></div>
+              <div class="action-grid two">
+                <button class="btn ghost" id="conImportBtn" type="button" data-i18n="constructor.import"></button>
+                <button class="btn ghost" id="conExportBtn" type="button" data-i18n="constructor.export"></button>
+              </div>
+            </div>
+            <div class="card note-card">
+              <strong data-i18n="constructor.status"></strong>
+              <p class="muted" id="conNote">—</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================== SOLVER ============================= -->
+      <section class="panel" id="panel-solver" role="tabpanel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="solver.title"></h2>
+            <p data-i18n="solver.subtitle"></p>
+          </div>
+        </div>
+
+        <div class="solver-source card">
+          <label class="select-label grow">
+            <span data-i18n="solver.source"></span>
+            <input id="solverInput" type="text" maxlength="120" data-i18n-placeholder="solver.importPlaceholder" autocomplete="off" spellcheck="false">
+          </label>
+          <button class="btn ghost" id="solverLoadCurrent" type="button" data-i18n="solver.current"></button>
+          <button class="btn ghost" id="solverExample" type="button" data-i18n="solver.example"></button>
+          <button class="btn primary" id="solverStartBtn" type="button" data-i18n="solver.start"></button>
+        </div>
+
+        <div class="solver-warning" id="solverWarnings" hidden></div>
+
+        <div class="solver-layout">
+          <div class="solver-board-column">
+            <div class="game-toolbar compact">
+              <div class="metric">
+                <span class="metric-label" data-i18n="solver.difficulty"></span>
+                <strong id="solverDifficulty">—</strong>
+              </div>
+              <div class="metric">
+                <span class="metric-label" data-i18n="solver.clueCount"></span>
+                <strong id="solverClues">—</strong>
+              </div>
+              <div class="toolbar-spacer"></div>
+              <span class="chip" id="solverCounter" data-i18n="solver.noSteps"></span>
+            </div>
+            <div class="board-wrap">
+              <div class="board solver-board" id="solverBoard" role="grid" data-i18n-aria-label="aria.board"></div>
+            </div>
+            <div class="playback">
+              <button class="btn ghost small" id="prevStepBtn" type="button" data-i18n="solver.prev"></button>
+              <input type="range" id="stepSlider" min="0" max="0" value="0" step="1" data-i18n-aria-label="solver.step">
+              <button class="btn ghost small" id="nextStepBtn" type="button" data-i18n="solver.next"></button>
+              <button class="btn outline small" id="autoplayBtn" type="button" data-i18n="solver.autoplay"></button>
+            </div>
+            <p class="keyboard-hint" data-i18n="solver.selectStep"></p>
+          </div>
+
+          <aside class="solver-side">
+            <div class="card explanation-card">
+              <div class="explain-head">
+                <div>
+                  <span class="eyebrow" data-i18n="solver.technique"></span>
+                  <h3 id="solverTechnique">—</h3>
+                </div>
+                <span class="chip tier-badge" id="solverTier">—</span>
+              </div>
+              <div class="explain-body">
+                <span class="eyebrow" data-i18n="solver.explanation"></span>
+                <p id="solverExplanation" data-i18n="solver.noSteps"></p>
+              </div>
+              <p class="legend" data-i18n="solver.highlightLegend"></p>
+            </div>
+            <div class="card summary-card">
+              <div class="summary-head">
+                <strong data-i18n="solver.stepsSummary"></strong>
+                <span class="chip" id="solverSolvedChip" hidden></span>
+              </div>
+              <div id="solverSummary" class="technique-counts"></div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="step-list-card card">
+          <div class="step-list-head">
+            <strong data-i18n="solver.stepList"></strong>
+            <span class="muted tiny" data-i18n="solver.selectStep"></span>
+          </div>
+          <ol class="step-list" id="stepList" data-i18n-aria-label="aria.stepList"></ol>
+        </div>
+      </section>
+
+      <!-- ============================== REPLAY ============================= -->
+      <section class="panel" id="panel-replay" role="tabpanel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="replay.title"></h2>
+            <p data-i18n="replay.subtitle"></p>
+          </div>
+          <span class="chip" data-i18n="replay.savedLocally"></span>
+        </div>
+
+        <div class="replay-layout">
+          <div class="board-column">
+            <div class="game-toolbar compact">
+              <div class="metric">
+                <span class="metric-label" data-i18n="play.difficulty"></span>
+                <strong id="replayDifficulty">—</strong>
+              </div>
+              <div class="metric">
+                <span class="metric-label" data-i18n="replay.operations"></span>
+                <strong id="replayActionCount">—</strong>
+              </div>
+              <div class="metric">
+                <span class="metric-label" data-i18n="replay.duration"></span>
+                <strong id="replayDuration">—</strong>
+              </div>
+              <div class="toolbar-spacer"></div>
+              <span class="chip" id="replayCounter" data-i18n="replay.noSelection"></span>
+            </div>
+            <div class="board-wrap">
+              <div class="board replay-board" id="replayBoard" role="grid" data-i18n-aria-label="aria.board"></div>
+            </div>
+            <div class="playback">
+              <button class="btn ghost small" id="replayPrev" type="button" data-i18n="replay.prev"></button>
+              <button class="btn primary small" id="replayPlay" type="button" data-i18n="replay.play"></button>
+              <button class="btn ghost small" id="replayNext" type="button" data-i18n="replay.next"></button>
+              <input type="range" id="replaySlider" min="0" max="0" value="0" step="1" data-i18n-aria-label="solver.step">
+            </div>
+            <p class="keyboard-hint" id="replayAction" data-i18n="replay.noSelection"></p>
+          </div>
+          <aside class="solver-side">
+            <div class="card">
+              <div class="summary-head">
+                <strong data-i18n="replay.history"></strong>
+                <span class="chip" id="replayListCount">0</span>
+              </div>
+              <div class="replay-list" id="replayList"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- =============================== STATS ============================= -->
+      <section class="panel" id="panel-stats" role="tabpanel">
+        <div class="panel-heading">
+          <div>
+            <h2 data-i18n="stats.title"></h2>
+            <p data-i18n="stats.subtitle"></p>
+          </div>
+          <button class="btn ghost" id="resetStatsBtn" type="button" data-i18n="stats.reset"></button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="card stat-hero">
+            <span class="eyebrow" data-i18n="stats.completed"></span>
+            <strong id="statsTotal">0</strong>
+            <span class="chip" data-i18n="stats.localOnly"></span>
+          </div>
+          <div class="card stat-card">
+            <span class="eyebrow" data-i18n="stats.fastest"></span>
+            <strong id="statsFastest">—</strong>
+          </div>
+          <div class="card stat-card">
+            <span class="eyebrow" data-i18n="stats.average"></span>
+            <strong id="statsAverage">—</strong>
+          </div>
+          <div class="card stats-diff-card">
+            <strong data-i18n="stats.byDifficulty"></strong>
+            <div class="stats-diff-row" data-diff="easy"><span data-diff-name="easy"></span><span id="statsEasy">—</span></div>
+            <div class="stats-diff-row" data-diff="medium"><span data-diff-name="medium"></span><span id="statsMedium">—</span></div>
+            <div class="stats-diff-row" data-diff="hard"><span data-diff-name="hard"></span><span id="statsHard">—</span></div>
+          </div>
+          <div class="card stats-recent-card">
+            <strong data-i18n="stats.recent"></strong>
+            <div id="statsRecent" class="stats-recent"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span data-i18n="footer.hint"></span>
+      <span class="dot-sep">·</span>
+      <span data-i18n="footer.version"></span>
+    </footer>
+  </div>
+
+  <!-- Import / export dialog -->
+  <dialog class="dialog" id="ioDialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head">
+        <div>
+          <h3 data-i18n="import.title"></h3>
+          <p class="muted" data-i18n="import.copyHint"></p>
+        </div>
+        <button class="icon-btn" id="ioCloseBtn" type="button" data-i18n-aria-label="common.close">×</button>
+      </div>
+      <p class="tiny muted" data-i18n="play.import.desc"></p>
+      <div class="io-ocr-entry">
+        <button class="btn outline full" id="ocrOpenBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg>
+          <span data-i18n="ocr.open"></span>
+        </button>
+        <p class="tiny muted ocr-offline-note" data-i18n="ocr.offline"></p>
+      </div>
+      <textarea id="ioTextarea" rows="4" spellcheck="false" data-i18n-placeholder="play.import.placeholder"></textarea>
+      <p class="form-error" id="ioError" hidden></p>
+      <div class="dialog-actions wrap">
+        <button class="btn ghost" id="ioPasteBtn" type="button" data-i18n="common.paste"></button>
+        <button class="btn primary" id="ioImportBtn" type="button" data-i18n="play.import.action"></button>
+        <span class="toolbar-spacer"></span>
+        <button class="btn ghost" id="ioCopyPuzzleBtn" type="button" data-i18n="play.export.puzzle"></button>
+        <button class="btn ghost" id="ioCopyCurrentBtn" type="button" data-i18n="play.export.current"></button>
+        <button class="btn ghost" id="ioCopySolutionBtn" type="button" data-i18n="play.export.solution"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Photo / camera OCR dialog -->
+  <dialog class="dialog ocr-dialog" id="ocrDialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head">
+        <div>
+          <h3 data-i18n="ocr.title"></h3>
+          <p class="muted tiny" data-i18n="ocr.desc"></p>
+        </div>
+        <button class="icon-btn" id="ocrCloseBtn" type="button" data-i18n-aria-label="common.close">×</button>
+      </div>
+      <ul class="ocr-guide">
+        <li><span class="ocr-guide-dot"></span><span data-i18n="ocr.guide.align"></span></li>
+        <li><span class="ocr-guide-dot"></span><span data-i18n="ocr.guide.light"></span></li>
+        <li><span class="ocr-guide-dot"></span><span data-i18n="ocr.guide.focus"></span></li>
+      </ul>
+      <div class="ocr-preview" id="ocrPreview">
+        <div class="ocr-placeholder" id="ocrPlaceholder">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H7l1.2-2h7.6L17 6h1.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <span data-i18n="ocr.previewEmpty"></span>
+        </div>
+        <img id="ocrImage" alt="" hidden>
+        <video id="ocrVideo" playsinline muted hidden></video>
+      </div>
+      <p class="tiny muted ocr-offline"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10V8a6 6 0 0 1 12 0v2"/><rect x="4" y="10" width="16" height="10" rx="2"/></svg><span data-i18n="ocr.offline"></span></p>
+      <div class="ocr-status" id="ocrStatus" hidden>
+        <span id="ocrStatusText" data-i18n="ocr.loading"></span>
+        <div class="ocr-progress"><span id="ocrProgressBar"></span></div>
+      </div>
+      <p class="form-error" id="ocrError" hidden></p>
+      <div class="dialog-actions wrap">
+        <button class="btn primary" id="ocrCameraBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H7l1.2-2h7.6L17 6h1.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <span data-i18n="ocr.camera"></span>
+        </button>
+        <button class="btn ghost" id="ocrAlbumBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>
+          <span data-i18n="ocr.album"></span>
+        </button>
+        <button class="btn primary" id="ocrCaptureBtn" type="button" hidden data-i18n="ocr.capture"></button>
+        <span class="toolbar-spacer"></span>
+        <button class="btn ghost" id="ocrRetryBtn" type="button" hidden data-i18n="ocr.retry"></button>
+        <button class="btn ghost" id="ocrCancelBtn" type="button" data-i18n="common.close"></button>
+      </div>
+      <input type="file" id="ocrFileInput" accept="image/*" hidden>
+      <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" hidden>
+    </form>
+  </dialog>
+
+  <!-- Win dialog -->
+  <dialog class="dialog win-dialog" id="winDialog">
+    <form method="dialog" class="dialog-card win-card">
+      <div class="win-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg>
+      </div>
+      <h3 data-i18n="play.win.title"></h3>
+      <p class="muted" data-i18n="play.win.subtitle"></p>
+      <div class="win-stats">
+        <div><span data-i18n="play.timer"></span><strong id="winTime">—</strong></div>
+        <div><span data-i18n="play.difficulty"></span><strong id="winDifficulty">—</strong></div>
+        <div><span data-i18n="play.techniqueLevel"></span><strong id="winRating">—</strong></div>
+      </div>
+      <div class="dialog-actions center">
+        <button class="btn ghost" id="winCloseBtn" type="button" data-i18n="common.close"></button>
+        <button class="btn primary" id="winNewBtn" type="button" data-i18n="play.new"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Core scripts are plain UMD files so index.html opens directly from disk
+       (file://) without a bundler or web server. -->
+  <script src="../src/engine/core.js"></script>
+  <script src="../src/engine/util.js"></script>
+  <script src="../src/engine/techniques/nakedSingle.js"></script>
+  <script src="../src/engine/techniques/hiddenSingle.js"></script>
+  <script src="../src/engine/techniques/lockedCandidatesPointing.js"></script>
+  <script src="../src/engine/techniques/lockedCandidatesClaiming.js"></script>
+  <script src="../src/engine/techniques/nakedPair.js"></script>
+  <script src="../src/engine/techniques/hiddenPair.js"></script>
+  <script src="../src/engine/techniques/nakedTriple.js"></script>
+  <script src="../src/engine/techniques/hiddenTriple.js"></script>
+  <script src="../src/engine/techniques/xWing.js"></script>
+  <script src="../src/engine/techniques/swordfish.js"></script>
+  <script src="../src/engine/techniques/yWing.js"></script>
+  <script src="../src/engine/techniques/xyzWing.js"></script>
+  <script src="../src/engine/techniques/skyscraper.js"></script>
+  <script src="../src/engine/techniques/twoStringKite.js"></script>
+  <script src="../src/engine/techniques/jellyfish.js"></script>
+  <script src="../src/engine/techniques/uniqueRectangle.js"></script>
+  <script src="../src/engine/techniques/simpleColouring.js"></script>
+  <script src="../src/engine/techniques/wWing.js"></script>
+  <script src="../src/engine/techniques/xyChain.js"></script>
+  <script src="../src/engine/index.js"></script>
+  <script src="../src/generator/index.js"></script>
+  <script src="../src/constructor/index.js"></script>
+  <script src="../src/replay/index.js"></script>
+  <script src="../src/stats/index.js"></script>
+  <script src="../src/ocr/templates.js"></script>
+  <script src="../src/ocr/classifier.js"></script>
+  <script src="../src/ocr/index.js"></script>
+  <script src="../src/ui/locales-data.js"></script>
+  <script src="../src/ui/i18n.js"></script>
+  <script src="../src/ui/ocr.js"></script>
+  <script src="../src/ui/app.js"></script>
+</body>
+</html>

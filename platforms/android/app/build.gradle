@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.sudokuacademy.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.sudokuacademy.app"
+        minSdk 24
+        targetSdk 35
+        versionCode 12
+        versionName "12.0.0"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            // Debug signing keeps the APK directly installable without a release key.
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// Generate all Web resources before invoking Gradle: npm run sync:platforms.
+def webRoot = new File(rootProject.projectDir, '../../.build/web')
+def assetsWww = layout.projectDirectory.dir('src/main/assets/www')
+tasks.register('syncWebAssets', Sync) {
+    from(webRoot) { include '**' }
+    into assetsWww
+    doFirst {
+        if (!new File(webRoot, 'index.html').exists()) {
+            throw new GradleException('Missing Web bundle. Run npm run sync:platforms from repo/.')
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'syncWebAssets' }

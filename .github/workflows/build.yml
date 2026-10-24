@@ -1,0 +1,46 @@
+name: Build and verify
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android-and-assets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npm test
+      - run: npm run dist:android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sudoku-android-and-assets
+          path: ../dist/
+          if-no-files-found: error
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run dist:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sudoku-windows-and-assets
+          path: ../dist/
+          if-no-files-found: error
