@@ -13,5 +13,5 @@
 - 所有平台共用同一套求解、生成、构造、回放/统计与 OCR 几何代码。
 - 网页/Windows/Android/iOS 使用离线 Tesseract WASM；微信使用离线模板分类器。
 - 拍照识别入口：游玩页侧栏「拍照识别导入」，也可从「导入/导出」进入。
-- 校验和见`metadata/SHA256SUMS.txt`（相对本目录）。
-- 各平台相机能力与限制见 `docs/OCR.md`（网页目录内未附 docs 时可查看源码仓库）。
+- 校验和见 `metadata/SHA256SUMS.txt`（相对本目录）。
+- 各平台相机能力与限制见 [源码仓库的 OCR 文档](https://github.com/Tao-ingenieur/sudoku/blob/main/docs/OCR.md)。

@@ -6,7 +6,7 @@
 
 - Node.js 22.12 或更新版本，npm；使用 `npm ci` 按锁文件安装依赖。
 - Windows 安装包：Windows x64；其他系统交叉构建需要额外工具。
-- Android：JDK 17、Android SDK Platform 35、接受 SDK 许可。
+- Android：JDK 17、Android SDK Platform 35、Build Tools 35.0.0、接受 SDK 许可。
 - iOS：生成交付工程不需要 Mac，编译及模拟器运行需要 macOS/Xcode。
 - 首次安装依赖和打包会下载工具；生成后的应用支持离线运行。
 
@@ -45,7 +45,7 @@ npm run dist
 ```
 
 前两条分别执行测试、生成共享交付件并构建对应平台。最后一条要求同一台机器
-具备 Windows 和 Android 工具链；遇到失败会返回错误，不会冒充构建成功。
+具备 Windows 和 Android 工具链；遇到失败会返回错误。
 
 Android 通过 `ANDROID_HOME` 或 `ANDROID_SDK_ROOT` 找到 SDK。Windows 使用
 `gradlew.bat`，Linux/macOS 使用 `gradlew`。调试 APK 不使用私人发布密钥，
@@ -76,3 +76,23 @@ npm run dist:verify
 
 GitHub Actions 在 Linux 构建 Android，在 Windows 构建 EXE，并分别上传交付件。
 iOS CI 不编译，交付 Xcode 工程。源码快照不包含以前开发环境中的历史 Git 标签。
+
+## 交付目录和版本来源
+
+| `../dist/` 子目录 | 内容 |
+| --- | --- |
+| `web/` | 可直接打开的完整离线网页 |
+| `windows/` | Windows x64 NSIS 安装版和便携版 |
+| `android/` | Android 7.0+ 调试 APK |
+| `ios/` | 带 Web 资源的 Xcode 工程，不含 IPA |
+| `wechat/` | 带共享核心的微信开发者工具工程 |
+| `metadata/` | 统一哈希清单与构建来源记录 |
+
+`build-info.json` 的整体 `sourceCommit` 对应最近整理交付目录时的源码提交，
+每个安装包条目下的 `sourceCommit` 对应该二进制实际构建时的提交。
+只更新文档和重新整理交付目录时，已有安装包来源会保留，不会标记为重新编译。
+当前应用版本由 `package.json` 定义，不以旧开发报告里的标签表为准。
+
+项目文档按职责维护：用户操作见 [USER_GUIDE.md](USER_GUIDE.md)，共享模块和平台适配见
+[ARCHITECTURE.md](ARCHITECTURE.md)，测试与设备检查见 [TESTING.md](TESTING.md)。
+每个平台交付目录的 README 来自 `docs/release/` 模板，应在这里修改后重新生成。
