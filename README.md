@@ -4,7 +4,7 @@
 支持简体中文、繁体中文、English、日本語、Français、Español。
 共享源码支持 Web、Windows、Android、iOS 和微信小程序。
 
-[English](docs/README.en.md) · [功能说明](docs/USER_GUIDE.md) · [构建指南](docs/BUILD.md)
+[English](docs/README.en.md) · [功能说明](docs/USER_GUIDE.md) · [构建指南](docs/BUILD.md) · [开发提示词](docs/DEVELOPMENT_PROMPT.md)
 
 ![游戏界面](docs/assets/play.png)
 

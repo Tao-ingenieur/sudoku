@@ -4,7 +4,7 @@ An offline teaching Sudoku app with unique-solution puzzles, a constructor,
 19 human-style solving techniques, photo import, replay, statistics and six languages.
 One shared source tree supports Web, Windows, Android, iOS and WeChat.
 
-[中文](../README.md) · [Build guide](BUILD.md) · [Detailed feature guide](USER_GUIDE.md)
+[中文](../README.md) · [Build guide](BUILD.md) · [Detailed feature guide](USER_GUIDE.md) · [Development prompt (Chinese)](DEVELOPMENT_PROMPT.md)
 
 ![Play screen](assets/play.png)
 
